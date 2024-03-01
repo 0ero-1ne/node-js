@@ -23,7 +23,6 @@ function connectToDatabase() {
 
     Weapon.hasMany(Turtle);
     
-
     Turtle.belongsTo(Pizza, {
         foreignKey: {
             name: 'favoritePizzaId'
@@ -36,7 +35,6 @@ function connectToDatabase() {
         },
         as: 'favoritePizza'
     });
-
 
     Turtle.belongsTo(Pizza, {
         foreignKey: {

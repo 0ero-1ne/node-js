@@ -36,7 +36,6 @@ class TurtleService {
     static async getTurtlesByFavoritePizza(pizza) {
         let error = null;
         
-        
         let turtles = await Turtle.findAll({ include: [
             {
                 model: Pizza,
@@ -106,7 +105,10 @@ class TurtleService {
 
         const turtle = await Turtle.update({
             name: input.name,
-            dps: input.dps,
+            color: input.color,
+            favoritePizzaId: input.favoritePizzaId,
+            secondFavoritePizzaId: input.secondFavoritePizzaId,
+            WeaponId: input.WeaponId
         }, {
             where: {
                 id: input.id

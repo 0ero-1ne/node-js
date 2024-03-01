@@ -6,7 +6,6 @@ const fs = require('fs');
 const { PizzaService } = require('./services/pizzaService');
 const { WeaponService } = require('./services/weaponService');
 const { TurtleService } = require('./services/turtleService');
-const { log } = require('console');
 
 const app = express();
 const port = 3000;

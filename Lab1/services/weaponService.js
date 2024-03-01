@@ -51,7 +51,7 @@ class WeaponService {
         }
 
         if (weapons.length === 0) {
-            error = `Info: There is no records in Weapons table with calories ${type === 'gt' ? '>' : '<'} ${value}`;
+            error = `Info: There is no records in Weapons table with dps ${type === 'gt' ? '>' : '<'} ${value}`;
             weapons = null;
         }
 
