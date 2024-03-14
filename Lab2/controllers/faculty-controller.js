@@ -23,6 +23,11 @@ class FacultyController {
         res.json(faculties);
     }
 
+    static async getSubjects(req, res) {
+        const facultySubjects = await facultyService.subjects(req, res);
+        res.json(facultySubjects);
+    }
+
     static async createFaculty(req, res) {
         const jsonValidation = await checkSchema(schema).run(req);
         

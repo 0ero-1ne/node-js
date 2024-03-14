@@ -53,9 +53,32 @@ const deleteAuditoriumType = async (req, res) => {
     return error === null ? auditoriumType : { message: error };
 };
 
+const getAuditoriums = async (req, res) => {
+    let error = null;
+
+    const id = req.params.id;
+
+    const auditoriums = await AuditoriumType.findUnique({
+        where: {
+            auditorium_type: id
+        },
+        select: {
+            auditorium_type: true,
+            auditoriums: {
+                select: {
+                    auditorium: true
+                }
+            }
+        }
+    }).catch((err) => error = err);
+
+    return error === null ? auditoriums : error;
+};
+
 export default {
     create: createAuditoriumType,
     read: getAuditoriumTypes,
     update: updateAuditoriumType,
     delete: deleteAuditoriumType,
+    auditoriums: getAuditoriums
 };

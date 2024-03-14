@@ -64,9 +64,46 @@ const deletePulpit = async (req, res) => {
     return error === null ? pulpit : { message: error };
 };
 
+const getPulpitsWithoutTeachers = async (req, res) => {
+    let error = null;
+
+    const pulpits = await Pulpit.findMany({
+        where: {
+            subjects: {
+                none: {}
+            }
+        },
+        select: {
+            pulpit: true,
+        }
+    }).catch((err) => error = err);
+
+    return error === null ? pulpits : error;
+};
+
+const getPulpitsWithVladimir = async (req, res) => {
+    let error = null;
+
+    const pulpits = await Pulpit.findMany({
+        where: {
+            teachers: {
+                some: {
+                    teacher_name: {
+                        contains: 'Владимир'
+                    }
+                }
+            }
+        }
+    }).catch((err) => error = err);
+
+    return error === null ? pulpits : error;
+};
+
 export default {
     create: createPulpit,
     read: getPulpits,
     update: updatePulpit,
     delete: deletePulpit,
+    withoutTeachers: getPulpitsWithoutTeachers,
+    withVladimir: getPulpitsWithVladimir
 };

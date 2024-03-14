@@ -65,9 +65,37 @@ const deleteFaculty = async (req, res) => {
     return error === null ? faculty : { message: error };
 }
 
+const getSubjects = async (req, res) => {
+    let error = null;
+
+    const id = req.params.id;
+
+    const facultySubjects = await Faculty.findUnique({
+        where: {
+            faculty: id
+        },
+        select: {
+            faculty: true,
+            pulpits: {
+                select: {
+                    pulpit: true,
+                    subjects: {
+                        select: {
+                            subject_name: true
+                        }
+                    }
+                }
+            }
+        }
+    }).catch((err) => error = err);
+
+    return error === null ? facultySubjects : error;
+};
+
 export default {
     create: createFaculty,
     read: getFaculties,
     update: updateFaculty,
     delete: deleteFaculty,
+    subjects: getSubjects
 };

@@ -12,6 +12,11 @@ class AuditoriumTypeController {
         res.json(auditoriumTypes);
     }
 
+    static async getAuditoriums(req, res) {
+        const auditoriums = await auditoriumTypeService.auditoriums(req, res);
+        res.json(auditoriums);
+    }
+
     static async createAuditoriumType(req, res) {
         const jsonValidation = await checkSchema(schema).run(req);
         

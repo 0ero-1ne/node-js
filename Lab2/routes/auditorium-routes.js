@@ -4,6 +4,8 @@ import AuditoriumController from '../controllers/auditorium-controller.js';
 const router = express.Router();
 
 router.get('/', AuditoriumController.getAuditoriums);
+router.get('/compauditoriums/:id', AuditoriumController.getCompAuditoriums);
+router.get('/samecount', AuditoriumController.getAuditoriumsWithSameCount);
 router.post('/', AuditoriumController.createAuditorium);
 router.put('/', AuditoriumController.updateAuditorium);
 router.delete('/:id', AuditoriumController.deleteAuditorium);

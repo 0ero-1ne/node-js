@@ -21,6 +21,16 @@ class AuditoriumController {
         res.json(auditoriums);
     }
 
+    static async getCompAuditoriums(req, res) {
+        const auditoriums = await auditoriumService.compAuditoriums(req, res);
+        res.json(auditoriums);
+    }
+
+    static async getAuditoriumsWithSameCount(req, res) {
+        const auditoriums = await auditoriumService.sameCount(req, res);
+        res.json(auditoriums);
+    }
+
     static async createAuditorium(req, res) {
         const jsonValidation = await checkSchema(schema).run(req);
         

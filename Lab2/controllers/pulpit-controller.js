@@ -21,6 +21,16 @@ class PulpitController {
         res.json(pulpits);
     }
 
+    static async getPulpitsWithoutTeachers(req, res) {
+        const pulpits = await pulpitService.withoutTeachers(req, res);
+        res.json(pulpits);
+    }
+
+    static async getPulpitsWithVladimir(req, res) {
+        const pulpits = await pulpitService.withVladimir(req, res);
+        res.json(pulpits);
+    }
+
     static async createPulpit(req, res) {
         const jsonValidation = await checkSchema(schema.create).run(req);
         

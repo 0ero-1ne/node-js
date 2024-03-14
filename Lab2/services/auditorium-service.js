@@ -57,9 +57,40 @@ const deleteAuditorium = async (req, res) => {
     return error === null ? auditorium : { message: error };
 };
 
+const getCompAuditoriums = async (req, res) => {
+    let error = null;
+
+    const id = req.params.id;
+
+    const auditoriums = await Auditorium.findMany({
+        where: {
+            auditorium: {
+                endsWith: `-${id}`
+            }
+        }
+    }).catch((err) => error = err);
+
+    return error === null ? auditoriums : error;
+};
+
+const getAuditoriumsWithSameCount = async (req, res) => {
+    let error = null;
+
+    const auditoriums = await Auditorium.groupBy({
+        by: ['auditorium_capacity', 'auditorium_type_id'],
+        _count: {
+            auditorium: true
+        },
+    }).catch((err) => error = err);
+
+    return error === null ? auditoriums : error;
+};
+
 export default {
     create: createAuditorium,
     read: getAuditoriums,
     update: updateAuditorium,
-    delete: deleteAuditorium
+    delete: deleteAuditorium,
+    compAuditoriums: getCompAuditoriums,
+    sameCount: getAuditoriumsWithSameCount
 };
