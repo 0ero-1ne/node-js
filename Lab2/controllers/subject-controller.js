@@ -1,7 +1,5 @@
-import prismaClient from "../prisma/prisma-client.js";
+import subjectService from "../services/subject-service.js";
 import { checkSchema } from "express-validator";
-
-const Subject = prismaClient.subject;
 
 const schema = {
     subject: { notEmpty: true, isString: true },
@@ -11,21 +9,11 @@ const schema = {
 
 class SubjectController {
     static async getSubjects(req, res) {
-        let error = null;
-
-        const subjects = await Subject.findMany()
-            .catch(err => error = err);
-
-        if (subjects.length === 0) {
-            error = 'Info: Subject table is empty';
-        }
-
-        error === null ? res.send(subjects) : res.json({ message: error });
+        const subjects = await subjectService.read(req, res);
+        res.json(subjects);
     }
 
     static async createSubject(req, res) {
-        let error = null;
-
         const jsonValidation = await checkSchema(schema).run(req);
         
         if (!SubjectController.#checkSchemaValid(jsonValidation)) {
@@ -33,20 +21,11 @@ class SubjectController {
             return;
         }
 
-        const subject = await Subject.create({
-            data: {
-                subject: req.body.subject,
-                subject_name: req.body.subject_name,
-                pulpit_id: req.body.pulpit_id
-            }
-        }).catch(() => error = `Error: Subject ${req.body.subject} is already exists`);
-
-        error === null ? res.send(subject) : res.json({ message: error });
+        const subject = await subjectService.create(req, res);
+        res.json(subject);
     }
 
     static async updateSubject(req, res) {
-        let error = null;
-
         const jsonValidation = await checkSchema(schema).run(req);
         
         if (!SubjectController.#checkSchemaValid(jsonValidation)) {
@@ -54,27 +33,13 @@ class SubjectController {
             return;
         }
 
-        const subject = await Subject.update({
-            where: { subject: req.body.subject },
-            data: {
-                subject_name: req.body.subject_name,
-                pulpit_id: req.body.pulpit_id
-            }
-        }).catch(err => error = `Error: Model ${err.meta.modelName}; ${err.meta.cause}`);
-
-        error === null ? res.send(subject) : res.json({ message: error });
+        const subject = await subjectService.update(req, res);
+        res.json(subject);
     }
 
     static async deleteSubject(req, res) {
-        let error = null;
-
-        const id = req.params.id;
-
-        const subject = await Subject.delete({
-            where: { subject: id }
-        }).catch(err => error = `Error: Model ${err.meta.modelName}; ${err.meta.cause}`);
-
-        error === null ? res.send(subject) : res.json({ message: error });
+        const subject = await subjectService.delete(req, res);
+        res.json(subject);
     }
 
     static #checkSchemaValid(schema) {

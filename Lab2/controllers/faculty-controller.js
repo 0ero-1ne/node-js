@@ -1,7 +1,5 @@
-import prismaClient from "../prisma/prisma-client.js";
+import facultyService from "../services/faculty-service.js";
 import { checkSchema } from "express-validator";
-
-const Faculty = prismaClient.faculty;
 
 const schema = {
     faculty: { notEmpty: true, isString: true },
@@ -21,21 +19,11 @@ const schema = {
 
 class FacultyController {
     static async getFaculties(req, res) {
-        let error = null;
-
-        const faculties = await Faculty.findMany()
-            .catch(err => error = err);
-
-        if (faculties.length === 0) {
-            error = 'Info: Faculty table is empty';
-        }
-
-        error === null ? res.send(faculties) : res.json({ message: error });
+        const faculties = await facultyService.read(req, res);
+        res.json(faculties);
     }
 
     static async createFaculty(req, res) {
-        let error = null;
-
         const jsonValidation = await checkSchema(schema).run(req);
         
         if (!FacultyController.#checkSchemaValid(jsonValidation)) {
@@ -43,33 +31,11 @@ class FacultyController {
             return;
         }
 
-        const faculty = await Faculty.upsert({
-            data: {
-                faculty: req.body.faculty,
-                faculty_name: req.body.faculty_name
-            }
-        }).catch(() => error = `Error: Faculty ${req.body.faculty} is already exists`);
-
-        if ('pulpits' in req.body) {
-            req.body.pulpits.forEach(async (p) => {
-                await prismaClient.pulpit.upsert({
-                    where: { pulpit: p.pulpit },
-                    create: { 
-                        pulpit: p.pulpit,
-                        pulpit_name: p.pulpit_name,
-                        faculty_id: faculty.faculty
-                    },
-                    update: {}
-                }).catch(err => error = err);
-            });
-        }
-
-        error === null ? res.send(faculty) : res.json({ message: error });
+        const faculty = await facultyService.create(req, res);
+        res.json(faculty);
     }
 
     static async updateFaculty(req, res) {
-        let error = null;
-
         const jsonValidation = await checkSchema(schema).run(req);
         
         if (!FacultyController.#checkSchemaValid(jsonValidation)) {
@@ -77,24 +43,13 @@ class FacultyController {
             return;
         }
 
-        const faculty = await Faculty.update({
-            where: { faculty: req.body.faculty },
-            data: { faculty_name: req.body.faculty_name }
-        }).catch(err => error = `Error: Model ${err.meta.modelName}; ${err.meta.cause}`);
-
-        error === null ? res.send(faculty) : res.json({ message: error });
+        const faculty = await facultyService.update(req, res);
+        res.json(faculty);
     }
 
     static async deleteFaculty(req, res) {
-        let error = null;
-
-        const id = req.params.id;
-
-        const faculty = await Faculty.delete({
-            where: { faculty: id }
-        }).catch(err => error = `Error: Model ${err.meta.modelName}; ${err.meta.cause}`);
-
-        error === null ? res.send(faculty) : res.json({ message: error });
+        const faculty = await facultyService.delete(req, res);
+        res.json(faculty);
     }
 
     static #checkSchemaValid(schema) {

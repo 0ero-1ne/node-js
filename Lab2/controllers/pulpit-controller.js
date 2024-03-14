@@ -1,7 +1,5 @@
-import prismaClient from "../prisma/prisma-client.js";
+import pulpitService from "../services/pulpit-service.js";
 import { checkSchema } from "express-validator";
-
-const Pulpit = prismaClient.pulpit;
 
 const schema = {
     create: {
@@ -19,21 +17,11 @@ const schema = {
 
 class PulpitController {
     static async getPulpits(req, res) {
-        let error = null;
-
-        const pulpits = await Pulpit.findMany()
-            .catch(err => error = err);
-
-        if (pulpits.length === 0) {
-            error = 'Info: Pulpit table is empty';
-        }
-
-        error === null ? res.send(pulpits) : res.json({ message: error });
+        const pulpits = await pulpitService.read(req, res);
+        res.json(pulpits);
     }
 
     static async createPulpit(req, res) {
-        let error = null;
-        
         const jsonValidation = await checkSchema(schema.create).run(req);
         
         if (!PulpitController.#checkSchemaValid(jsonValidation)) {
@@ -41,29 +29,11 @@ class PulpitController {
             return;
         }
 
-        const faculty = await prismaClient.faculty.upsert({
-            where: { faculty: req.body.faculty.faculty },
-            create: {
-                faculty: req.body.faculty.faculty,
-                faculty_name: req.body.faculty.faculty_name
-            },
-            update: {}
-        }).catch(err => error = err);
-
-        const pulpit = await Pulpit.create({
-            data: {
-                pulpit: req.body.pulpit,
-                pulpit_name: req.body.pulpit_name,
-                faculty_id: faculty.faculty
-            }
-        }).catch(() => error = `Error: Pulpit ${req.body.pulpit} is already exists`);
-
-        error === null ? res.send(pulpit) : res.json({ message: error });
+        const pulpit = await pulpitService.create(req, res);
+        res.json(pulpit);
     }
 
     static async updatePulpit(req, res) {
-        let error = null;
-        
         const jsonValidation = await checkSchema(schema.update).run(req);
         
         if (!PulpitController.#checkSchemaValid(jsonValidation)) {
@@ -71,27 +41,13 @@ class PulpitController {
             return;
         }
 
-        const pulpit = await Pulpit.update({
-            where: { pulpit: req.body.pulpit },
-            data: {
-                pulpit_name: req.body.pulpit_name,
-                faculty_id: req.body.faculty
-            }
-        }).catch(err => error = `Error: Model ${err.meta.modelName}; ${err.meta.cause}`);
-
-        error === null ? res.send(pulpit) : res.json({ message: error });
+        const pulpit = await pulpitService.update(req, res);
+        res.json(pulpit);
     }
 
     static async deletePulpit(req, res) {
-        let error = null;
-
-        const id = req.params.id;
-
-        const pulpit = await Pulpit.delete({
-            where: { pulpit: id }
-        }).catch(err => error = `Error: Model ${err.meta.modelName}; ${err.meta.cause}`);
-
-        error === null ? res.send(pulpit) : res.json({ message: error });
+        const pulpit = await pulpitService.delete(req, res);
+        res.json(pulpit);
     }
 
     static #checkSchemaValid(schema) {
