@@ -21,6 +21,11 @@ class PulpitController {
         res.json(pulpits);
     }
 
+    static async getPulpitsByPage(req, res) {
+        const pulpits = await pulpitService.byPage(req, res);
+        res.json(pulpits);
+    }
+
     static async getPulpitsWithoutTeachers(req, res) {
         const pulpits = await pulpitService.withoutTeachers(req, res);
         res.json(pulpits);

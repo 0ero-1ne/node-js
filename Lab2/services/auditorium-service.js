@@ -86,11 +86,30 @@ const getAuditoriumsWithSameCount = async (req, res) => {
     return error === null ? auditoriums : error;
 };
 
+const transaction = async (req, res) => {
+    try {
+        await prismaClient.$transaction(async (tx) => {
+            const auditoriums = await tx.auditorium.updateMany({
+                data: {
+                    auditorium_capacity: {
+                        increment: 1
+                    }
+                }
+            });
+
+            throw new Error('Rollback transaction');
+        });
+    } catch(err) {
+        console.log(err);
+    }
+};
+
 export default {
     create: createAuditorium,
     read: getAuditoriums,
     update: updateAuditorium,
     delete: deleteAuditorium,
     compAuditoriums: getCompAuditoriums,
-    sameCount: getAuditoriumsWithSameCount
+    sameCount: getAuditoriumsWithSameCount,
+    transaction: transaction
 };

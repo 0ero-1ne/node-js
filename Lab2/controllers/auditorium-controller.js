@@ -60,6 +60,11 @@ class AuditoriumController {
         res.json(auditorium);
     }
 
+    static async transaction(req, res) {
+        const transaction = await auditoriumService.transaction(req, res);
+        res.json(transaction);
+    }
+
     static #checkSchemaValid(schema) {
         return schema.filter(item => item.errors.length !== 0).length === 0;
     }

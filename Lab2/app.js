@@ -1,24 +1,35 @@
 import express from 'express';
-import facultyRoutes from './routes/faculty-routes.js';
-import pulpitRoutes from './routes/pulpit-routes.js';
-import subjectRoutes from './routes/subject-routes.js';
-import teacherRoutes from './routes/teacher-routes.js';
-import auditoriumTypeRoutes from './routes/auditorium-type-routes.js';
-import auditoriumRoutes from './routes/auditorium-routes.js';
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+import routes from './routes/routes.js';
+import FacultyFluent from './fluent/faculties-fluent.js';
 
 const app = express();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 app.use(express.json());
 
-app.use('/api/faculties', facultyRoutes);
-app.use('/api/pulpits', pulpitRoutes);
-app.use('/api/subjects', subjectRoutes);
-app.use('/api/teachers', teacherRoutes);
-app.use('/api/auditorium-types', auditoriumTypeRoutes);
-app.use('/api/auditoriums', auditoriumRoutes);
+app.use('/api/faculties', routes.faculty);
+app.use('/api/pulpits', routes.pulpit);
+app.use('/api/subjects', routes.subject);
+app.use('/api/teachers', routes.teacher);
+app.use('/api/auditorium-types', routes.auditoriumType);
+app.use('/api/auditoriums', routes.auditorium);
 
 app.get('/', (req, res) => {
-    res.send('<h1>Hello, World!</h1>');
+    res.redirect('/index?page=1');
+});
+
+app.get('/index', (req, res) => {
+    res.sendFile(path.join(__dirname + '/index.html'));
+});
+
+app.get('/fluent', async (req, res) => {
+    const facultyFluent = new FacultyFluent();
+    (await (await facultyFluent.addFaculty('fit')).addFaculty('fik')).removeFaculty('fil');
+    
+    res.json(facultyFluent.faculties);
 });
 
 app.listen(3000, () => {

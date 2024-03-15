@@ -15,6 +15,31 @@ const getPulpits = async (req, res) => {
     return error === null ? pulpits : { message: error };
 };
 
+const getPulpitsByPage = async (req, res) => {
+    const pulpits = await Pulpit.findMany({
+        select: {
+            pulpit: true,
+            pulpit_name: true,
+            faculty_id: true,
+            _count: {
+                select: {
+                    teachers: {}
+                }
+            }
+        }
+    });
+    let page = +req.params.page - 1;
+    let result = [];
+
+    for (let i = 10 * page; i < 10 * page + 10; i++) {
+        if (pulpits[i] !== undefined) {
+            result.push(pulpits[i]);
+        }
+    }
+
+    return [ pulpits.length, result ];
+};
+
 const createPulpit = async (req, res) => {
     let error = null;
 
@@ -105,5 +130,6 @@ export default {
     update: updatePulpit,
     delete: deletePulpit,
     withoutTeachers: getPulpitsWithoutTeachers,
-    withVladimir: getPulpitsWithVladimir
+    withVladimir: getPulpitsWithVladimir,
+    byPage: getPulpitsByPage
 };
