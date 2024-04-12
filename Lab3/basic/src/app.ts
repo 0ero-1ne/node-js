@@ -1,10 +1,11 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import session from "express-session";
 import path from "path";
 import passport from "./passport-basic";
 
 const app = express();
 const port : number = 3000;
+let logout : boolean = false;
 
 app.use(express.static('static'));
 app.use(session({
@@ -21,19 +22,21 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.get('/login',
-    passport.authenticate('basic', { session: true }),
-    (req : Request, res : Response) => {
-        if (req.user) {
-            res.redirect('/');
-            return;
+    (req : Request, res : Response, next : NextFunction) => {
+        if (req.headers.authorization && logout) {
+            logout = false;
+            delete req.headers.authorization;
         }
-});
+        next();
+    }, passport.authenticate('basic', { session: true, successRedirect: '/'}),   
+);
 
 app.get('/logout', (req : Request, res : Response) => {
     req.logOut((err) => {});
     res.status(200).clearCookie('connect.sid', {
         path: '/'
     });
+    logout = true;
     res.redirect('/');
 });
 

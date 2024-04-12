@@ -9,6 +9,7 @@ const path_1 = __importDefault(require("path"));
 const passport_digest_1 = __importDefault(require("./passport-digest"));
 const app = (0, express_1.default)();
 const port = 3001;
+let logout = false;
 app.use(express_1.default.static('static'));
 app.use((0, express_session_1.default)({
     secret: 'system of a down',
@@ -20,17 +21,19 @@ app.use(passport_digest_1.default.session());
 app.get('/', (req, res) => {
     res.sendFile(path_1.default.join(__dirname + '/../static/index.html'));
 });
-app.get('/login', passport_digest_1.default.authenticate('digest', { session: true }), (req, res) => {
-    if (req.user) {
-        res.redirect('/');
-        return;
+app.get('/login', (req, res, next) => {
+    if (req.headers.authorization && logout) {
+        logout = false;
+        delete req.headers.authorization;
     }
-});
+    next();
+}, passport_digest_1.default.authenticate('digest', { session: true, successRedirect: '/' }));
 app.get('/logout', (req, res) => {
     req.logOut((err) => { });
-    res.status(200).clearCookie('connect.sid', {
+    res.clearCookie('connect.sid', {
         path: '/'
     });
+    logout = true;
     res.redirect('/');
 });
 app.get('/resource', (req, res) => {
