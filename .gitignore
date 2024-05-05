@@ -1,2 +1,3 @@
-*/node_modules
-/Задания
+.gitignore
+node_modules
+/Tasks
